@@ -3,12 +3,13 @@
 
 import lxml.html as lh
 from lxml.html.clean import clean_html
+from urllib import urlencode
 
-foo = lh.parse('http://stats.espncricinfo.com/stats/engine/player/45789.html?class=11;type=allround;template=results')
-foo = foo.xpath("//tr[contains(@class, 'data1')]")
+#foo = lh.parse('http://stats.espncricinfo.com/stats/engine/player/45789.html?class=11;type=allround;template=results')
+#foo = foo.xpath("//tr[contains(@class, 'data1')]")
 
-class Mappings:
-    self.country_codes = {
+class Mapper:
+    country_codes = {
         'Afghanistan' : 40,
         'Australia' : 2,
         'Bangladesh' : 25,
@@ -27,26 +28,49 @@ class Mappings:
         'Zimbabwe' : 9
     }
 
-    self.venues = {
+    venues = {
         'home' : 1,
         'away' : 2,
         'neutral' : 3
     }
 
-    self.formats = {
+    formats = {
         'Tests' : 1,
         'ODIs' : 2,
         'T20Is' : 3,
         'All' : 11
     }
 
-    self.mappings = {
-        'class' : self.formats,
-        'opposition' : self.country_codes,
-        'host' : self.country_codes,
-        'home_or_away' : self.venues,
+    mappings = {
+        'class' : formats,
+        'opposition' : country_codes,
+        'host' : country_codes,
+        'home_or_away' : venues,
         'year' : ''
     }
+
+    def map_string(self, request, target_url):
+        cmds = {
+            'vs' : 'opposition',
+            'in' : 'host',
+            'at' : 'home_or_away',
+            'format' : 'class',
+            'year' : 'year'
+        }
+
+        queries = request.split(",")
+        print queries
+        request_map = {}
+        #request_map['Player'] = queries[0]
+
+        for query in queries[1:]:
+            print query
+            k, v = query.split(None, 1)
+            param = cmds[k]
+            request_map[param] = self.mappings[param][v]
+
+        request_url = urlencode(request_map).replace("&", ";")
+        return target_url.replace("class=11;", "") + ';template=results;' + request_url
 
 class PlayerFinder:
     base_url = "http://stats.espncricinfo.com"
@@ -79,4 +103,6 @@ class PlayerFinder:
 if __name__ == "__main__":
     foo = str(raw_input())
     bar = PlayerFinder(foo)
-    print bar.zero_in()
+    print bar
+    a = Mapper()
+    print a.map_string(str(raw_input()), bar.zero_in())
