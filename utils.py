@@ -18,7 +18,7 @@ class Mapper:
         'india' : 6,
         'ireland' : 29,
         'netherlands' : 15,
-        'new Zealand' : 5,
+        'new zealand' : 5,
         'pakistan' : 7,
         'scotland' : 30,
         'south africa' : 3,
