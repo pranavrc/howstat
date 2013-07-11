@@ -138,21 +138,21 @@ class Prettifier:
         if allround:
             splice_length = list_length / 2
             header = self.splice_list(list_length, splice_length)
-            tr = '|' + '|'.join(x for x in self.stat_list[splice_length:]) + '|'
+            tr = '|Overall|' + '|'.join(x for x in self.stat_list[splice_length:]) + '|'
         else:
             splice_length = list_length / 3
             header = self.splice_list(list_length, splice_length)
-            tr1 = '|' + '|'.join(x for x in \
+            tr1 = '|Unfiltered|' + '|'.join(x for x in \
                                  self.stat_list[splice_length:list_length-splice_length]) + '|'
-            tr2 = '|' + '|'.join(x for x in \
+            tr2 = '|Filtered|' + '|'.join(x for x in \
                                  self.stat_list[list_length-splice_length:list_length]) + '|'
             tr = tr1 + '\n' + tr2
 
         return header + tr
 
     def splice_list(self, list_length, splice_length):
-        td = '|' + '|'.join(x for x in self.stat_list[0:splice_length]) + '|'
-        delim = '|:' + '|:'.join('' for x in range(splice_length)) + '|:|'
+        td = '||' + '|'.join(x for x in self.stat_list[0:splice_length]) + '|'
+        delim = '|:' + '|:'.join('' for x in range(splice_length)) + '|:|:|'
         return td + '\n' + delim + '\n'
 
 if __name__ == "__main__":
