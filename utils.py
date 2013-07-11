@@ -63,15 +63,22 @@ class Mapper:
         queries = request.split(",")
         request_map = {}
         self.player_name = queries[0]
+        class_found = False
 
         for query in queries[1:]:
             k, v = query.split(None, 1)
             param = cmds[k]
 
+            if param == 'class':
+                class_found = True
+
             if param == 'year':
                 request_map[param] = v
             else:
                 request_map[param] = self.mappings[param][v]
+
+        if not class_found:
+            request_map['class'] = 11
 
         request_url = urlencode(request_map).replace("&", ";")
         return request_url
