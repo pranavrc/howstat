@@ -7,9 +7,6 @@ from lxml.etree import tostring
 from urllib import urlencode
 import re
 
-#foo = lh.parse('http://stats.espncricinfo.com/stats/engine/player/45789.html?class=11;type=allround;template=results')
-#foo = foo.xpath("//tr[contains(@class, 'data1')]")
-
 class Mapper:
     country_codes = {
         'Afghanistan' : 40,
@@ -52,6 +49,7 @@ class Mapper:
     }
 
     player_name = ""
+    class_allround = False
 
     def map_string(self, request):
         cmds = {
@@ -81,6 +79,9 @@ class Mapper:
 
         if not class_found:
             request_map['class'] = 11
+
+        if len(request_map) == 1:
+            self.class_allround = True
 
         request_url = urlencode(request_map).replace("&", ";")
         return request_url
@@ -130,6 +131,30 @@ class Prettifier:
                                             'unfiltered', 'overall', 'filtered']][1:-1]
         return element_list
 
+    def prettify(self, allround):
+        self.stat_list = self.make_list()
+        list_length = len(self.stat_list)
+
+        if allround:
+            splice_length = list_length / 2
+            header = self.splice_list(list_length, splice_length)
+            tr = '|' + '|'.join(x for x in self.stat_list[splice_length:]) + '|'
+        else:
+            splice_length = list_length / 3
+            header = self.splice_list(list_length, splice_length)
+            tr1 = '|' + '|'.join(x for x in \
+                                 self.stat_list[splice_length:list_length-splice_length]) + '|'
+            tr2 = '|' + '|'.join(x for x in \
+                                 self.stat_list[list_length-splice_length:list_length]) + '|'
+            tr = tr1 + '\n' + tr2
+
+        return header + tr
+
+    def splice_list(self, list_length, splice_length):
+        td = '|' + '|'.join(x for x in self.stat_list[0:splice_length]) + '|'
+        delim = '|:' + '|:'.join('' for x in range(splice_length)) + '|:|'
+        return td + '\n' + delim + '\n'
+
 if __name__ == "__main__":
     #foo = str(raw_input())
     #bar = PlayerFinder(foo)
@@ -138,4 +163,4 @@ if __name__ == "__main__":
     b = a.map_string(str(raw_input()))
     c = PlayerFinder(a.player_name)
     d = Prettifier(c.zero_in().replace("class=11;", "") + b)
-    print d.make_list()
+    print d.prettify(a.class_allround)
