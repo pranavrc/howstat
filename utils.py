@@ -9,35 +9,35 @@ import re
 
 class Mapper:
     country_codes = {
-        'Afghanistan' : 40,
-        'Australia' : 2,
-        'Bangladesh' : 25,
-        'Bermuda' : 12,
-        'England' : 1,
-        'Hong Kong' : 19,
-        'India' : 6,
-        'Ireland' : 29,
-        'Netherlands' : 15,
-        'New Zealand' : 5,
-        'Pakistan' : 7,
-        'Scotland' : 30,
-        'South Africa' : 3,
-        'Sri Lanka' : 8,
-        'West Indies' : 4,
-        'Zimbabwe' : 9
+        'afghanistan' : 40,
+        'australia' : 2,
+        'bangladesh' : 25,
+        'bermuda' : 12,
+        'england' : 1,
+        'hong kong' : 19,
+        'india' : 6,
+        'ireland' : 29,
+        'netherlands' : 15,
+        'new Zealand' : 5,
+        'pakistan' : 7,
+        'scotland' : 30,
+        'south africa' : 3,
+        'sri lanka' : 8,
+        'west indies' : 4,
+        'zimbabwe' : 9
     }
 
     venues = {
-        'Home' : 1,
-        'Away' : 2,
-        'Neutral' : 3
+        'home' : 1,
+        'away' : 2,
+        'neutral' : 3
     }
 
     formats = {
-        'Tests' : 1,
-        'ODIs' : 2,
-        'T20Is' : 3,
-        'All' : 11
+        'tests' : 1,
+        'odis' : 2,
+        't20is' : 3,
+        'all' : 11
     }
 
     mappings = {
@@ -67,15 +67,15 @@ class Mapper:
 
         for query in queries[1:]:
             k, v = query.split(None, 1)
-            param = cmds[k]
+            param = cmds[k.lower()]
 
             if param == 'class':
                 class_found = True
 
             if param == 'year':
-                request_map[param] = v
+                request_map[param] = v.lower()
             else:
-                request_map[param] = self.mappings[param][v]
+                request_map[param] = self.mappings[param][v.lower()]
 
         if not class_found:
             request_map['class'] = 11
