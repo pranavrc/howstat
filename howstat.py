@@ -1,20 +1,59 @@
 #!/usr/bin/env python
 
 import praw
-import utils
+from utils import Mapper, PlayerFinder, Prettifier
 
-r = praw.Reddit(user_agent = "Howstat v 1.0 by /u/pranavrc"
-                             "http://github.com/pranavrc/howstat/")
-r.login('username', 'password')
-subreddit = r.get_subreddit('cricket')
-newDealt, oldDealt = set(), set()
+def fetch_stats(request):
+    init = Mapper()
+    try:
+        mapped = init.map_string(request)
+    except:
+        return "Huh? Bad request."
 
-while True:
-    latest_comments = subreddit.get_comments()
+    try:
+        player_url = PlayerFinder(init.player_name)
+    except:
+        return "Sorry, the service isn't available right now."
 
-    for comment in latest_comments:
-        if "agar" in comment.body and comment.id not in oldDealt:
-            newDealt.add(comment.id)
-            print comment.body
+    try:
+        base_url = player_url.zero_in().replace("class=11;", "")
 
-    oldDealt = newDealt
+        if base_url[-1] == ";":
+            base_url += mapped
+            prettifier = Prettifier(base_url)
+        else:
+            return base_url
+    except:
+        return "Records not found."
+
+    try:
+        final = prettifier.prettify(init.class_allround)
+    except:
+        return "Records not found."
+
+    return final
+
+
+if __name__ == "__main__":
+    r = praw.Reddit(user_agent = "Howstat v 1.0 by /u/pranavrc"
+                                 "http://github.com/pranavrc/howstat/")
+    r.login('username', 'password')
+    subreddit = r.get_subreddit('howstat')
+    newDealt, oldDealt = set(), set()
+
+    while True:
+        latest_comments = subreddit.get_comments()
+
+        for comment in latest_comments:
+            if "howstat" in comment.body and comment.id not in oldDealt:
+                print comment.body
+                newDealt.add(comment.id)
+
+                for each_line in comment.body.split('\n'):
+                    if each_line.strip()[0:7] == 'howstat':
+                        request = each_line.replace('howstat', '').strip()
+                        response = fetch_stats(request)
+                        comment.upvote()
+                        comment.reply(response)
+
+        oldDealt = newDealt
