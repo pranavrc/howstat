@@ -2,8 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import lxml.html as lh
-from lxml.html.clean import clean_html
+from lxml.html.clean import Cleaner
+from lxml.etree import tostring
 from urllib import urlencode
+import re
 
 #foo = lh.parse('http://stats.espncricinfo.com/stats/engine/player/45789.html?class=11;type=allround;template=results')
 #foo = foo.xpath("//tr[contains(@class, 'data1')]")
@@ -111,6 +113,23 @@ class PlayerFinder:
 
         return self.response
 
+class Prettifier:
+    target_url = ""
+    def __init__(self, target_url):
+        self.target_url = target_url
+        self.stat_list = []
+
+    def make_list(self):
+        document = lh.parse(self.target_url)
+        child_element = document.xpath('.//caption[contains(text(), "Career averages")]')
+        target_element = child_element[0].getparent()
+        cleaner = Cleaner(page_structure = True, allow_tags = [''], remove_unknown_tags = False)
+        element_text = tostring(cleaner.clean_html(target_element))
+        element_list = [x.strip() for x in re.split('\n', element_text) \
+                        if x.strip() not in ['Career averages', '', 'Profile', \
+                                            'unfiltered', 'overall', 'filtered']][1:-1]
+        return element_list
+
 if __name__ == "__main__":
     #foo = str(raw_input())
     #bar = PlayerFinder(foo)
@@ -118,4 +137,5 @@ if __name__ == "__main__":
     a = Mapper()
     b = a.map_string(str(raw_input()))
     c = PlayerFinder(a.player_name)
-    print c.zero_in().replace("class=11;", "") + b
+    d = Prettifier(c.zero_in().replace("class=11;", "") + b)
+    print d.make_list()
