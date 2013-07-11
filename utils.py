@@ -29,9 +29,9 @@ class Mapper:
     }
 
     venues = {
-        'home' : 1,
-        'away' : 2,
-        'neutral' : 3
+        'Home' : 1,
+        'Away' : 2,
+        'Neutral' : 3
     }
 
     formats = {
@@ -49,7 +49,9 @@ class Mapper:
         'year' : ''
     }
 
-    def map_string(self, request, target_url):
+    player_name = ""
+
+    def map_string(self, request):
         cmds = {
             'vs' : 'opposition',
             'in' : 'host',
@@ -59,18 +61,20 @@ class Mapper:
         }
 
         queries = request.split(",")
-        print queries
         request_map = {}
-        #request_map['Player'] = queries[0]
+        self.player_name = queries[0]
 
         for query in queries[1:]:
-            print query
             k, v = query.split(None, 1)
             param = cmds[k]
-            request_map[param] = self.mappings[param][v]
+
+            if param == 'year':
+                request_map[param] = v
+            else:
+                request_map[param] = self.mappings[param][v]
 
         request_url = urlencode(request_map).replace("&", ";")
-        return target_url.replace("class=11;", "") + ';template=results;' + request_url
+        return request_url
 
 class PlayerFinder:
     base_url = "http://stats.espncricinfo.com"
@@ -96,13 +100,15 @@ class PlayerFinder:
         elif len(entries) == 0:
             self.response = "Not found."
         else:
-            self.response = self.base_url + entries[0].get('href')
+            self.response = self.base_url + entries[0].get('href') + ';template=results;'
 
         return self.response
 
 if __name__ == "__main__":
-    foo = str(raw_input())
-    bar = PlayerFinder(foo)
-    print bar
+    #foo = str(raw_input())
+    #bar = PlayerFinder(foo)
+    #print bar
     a = Mapper()
-    print a.map_string(str(raw_input()), bar.zero_in())
+    b = a.map_string(str(raw_input()))
+    c = PlayerFinder(a.player_name)
+    print c.zero_in().replace("class=11;", "") + b
