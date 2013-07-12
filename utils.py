@@ -108,7 +108,7 @@ class PlayerFinder:
                     self.response.append(player_text)
             self.response = "Huh? " + " or ".join(self.response) + "?"
         elif len(entries) == 0:
-            self.response = "Not found."
+            self.response = "I...couldn't find that."
         else:
             self.response = self.base_url + entries[0].get('href') + ';template=results;'
 
@@ -161,6 +161,9 @@ if __name__ == "__main__":
     #print bar
     a = Mapper()
     b = a.map_string(str(raw_input()))
+    print b
     c = PlayerFinder(a.player_name)
-    d = Prettifier(c.zero_in().replace("class=11;", "") + b)
-    print d.prettify(a.class_allround)
+    d = c.zero_in().replace("class=11;", "")
+    print d
+    e = Prettifier(d + b)
+    print e.prettify(a.class_allround)
