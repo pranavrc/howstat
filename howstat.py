@@ -6,9 +6,6 @@ from time import sleep
 
 def fetch_stats(request):
     init = Mapper()
-    footer = "_____\n^(/u/howstat - Unofficial /r/Cricket  Statbot. Uses) " + \
-            "[^Statsguru](http://stats.espncricinfo.com/ci/engine/stats/index.html)^. " + \
-            "^(Check out the) [^Code!](http://github.com/pranavrc/howstat/)"
 
     try:
         mapped = init.map_string(request)
@@ -36,7 +33,9 @@ def fetch_stats(request):
     except:
         return "Records not found."
 
-    return final + '\n\n' + footer
+    elaborate = "Detailed Stats [here.](%s)" % base_url
+
+    return request + ':\n\n' + final + '\n\n' + elaborate
 
 
 if __name__ == "__main__":
@@ -45,6 +44,9 @@ if __name__ == "__main__":
     r.login('username', 'password')
     subreddit = r.get_subreddit('howstat')
     newDealt, oldDealt = set(), set()
+    footer = "_____\n^(/u/howstat - Unofficial /r/Cricket  Statbot. Uses) " + \
+            "[^Statsguru](http://stats.espncricinfo.com/ci/engine/stats/index.html)^. " + \
+            "^(Check out the) [^Code!](http://github.com/pranavrc/howstat/)"
 
     while True:
         latest_comments = subreddit.get_comments()
@@ -53,17 +55,18 @@ if __name__ == "__main__":
             if "howstat" in comment.body and comment.id not in oldDealt \
                and comment.author != "howstat":
                 newDealt.add(comment.id)
+                response = ""
 
-                try:
-                    for each_line in comment.body.split('\n'):
-                        if each_line.strip()[0:7] == 'howstat':
-                            request = each_line.replace('howstat', '').strip()
-                            response = fetch_stats(request)
-                            print response
-                            comment.upvote()
-                            comment.reply(response)
-                except IOError:
-                    newDealt.remove(comment.id)
+                for each_line in comment.body.split('\n'):
+                    if each_line.strip()[0:7] == 'howstat':
+                        request = each_line.replace('howstat', '').strip()
+                        response += fetch_stats(request) + '\n\n'
+
+                if response:
+                    response += footer
+                    print response + '\n\n\n\n\n'
+                    #comment.upvote()
+                    #comment.reply(response)
 
         oldDealt = newDealt
         sleep(60)
