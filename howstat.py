@@ -2,9 +2,14 @@
 
 import praw
 from utils import Mapper, PlayerFinder, Prettifier
+from time import sleep
 
 def fetch_stats(request):
     init = Mapper()
+    footer = "_____\n^(/u/howstat - Unofficial /r/Cricket  Statbot. Uses) " + \
+            "[^Statsguru](http://stats.espncricinfo.com/ci/engine/stats/index.html)^. " + \
+            "^(Check out the) [^Code!](http://github.com/pranavrc/howstat/)"
+
     try:
         mapped = init.map_string(request)
     except:
@@ -31,7 +36,7 @@ def fetch_stats(request):
     except:
         return "Records not found."
 
-    return final
+    return final + '\n\n' + footer
 
 
 if __name__ == "__main__":
@@ -45,15 +50,20 @@ if __name__ == "__main__":
         latest_comments = subreddit.get_comments()
 
         for comment in latest_comments:
-            if "howstat" in comment.body and comment.id not in oldDealt:
-                print comment.body
+            if "howstat" in comment.body and comment.id not in oldDealt \
+               and comment.author != "howstat":
                 newDealt.add(comment.id)
 
-                for each_line in comment.body.split('\n'):
-                    if each_line.strip()[0:7] == 'howstat':
-                        request = each_line.replace('howstat', '').strip()
-                        response = fetch_stats(request)
-                        comment.upvote()
-                        comment.reply(response)
+                try:
+                    for each_line in comment.body.split('\n'):
+                        if each_line.strip()[0:7] == 'howstat':
+                            request = each_line.replace('howstat', '').strip()
+                            response = fetch_stats(request)
+                            print response
+                            comment.upvote()
+                            comment.reply(response)
+                except IOError:
+                    newDealt.remove(comment.id)
 
         oldDealt = newDealt
+        sleep(60)
