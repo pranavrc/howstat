@@ -57,22 +57,23 @@ if __name__ == "__main__":
     subreddit = r.get_subreddit('howstat')
     footer = "\n^(/u/howstat - Resident /r/Cricket  Statbot. Uses) " + \
             "[^Statsguru](http://stats.espncricinfo.com/ci/engine/stats/index.html)^. " + \
-            "^(Check out the) [^Code!](http://github.com/pranavrc/howstat/)"
+            "^(Check out the) [^code](http://github.com/pranavrc/howstat/) " + \
+            "^(and the) [^HowTo!](http://redd.it/1i7lh3)"
     pending_comments = []
 
     while True:
         latest_comments = [cmt for cmt in subreddit.get_comments()]
 
         for comment in latest_comments + pending_comments:
-            if "howstat" in comment.body and not dealt_with(comment) \
+            if "howstat" or "Howstat" in comment.body and not dealt_with(comment) \
                and str(comment.author) != "howstat":
                 response = ""
                 pending_comments.append(comment)
                 request_limit = 1
 
                 for each_line in comment.body.split('\n'):
-                    if each_line.strip()[0:7] == 'howstat':
-                        request = each_line.replace('howstat', '').strip()
+                    if each_line.strip()[0:7] in ['howstat', 'Howstat']:
+                        request = each_line.replace('howstat', '').strip('., ')
                         response += fetch_stats(request) + '\n\n_____\n\n'
                         request_limit += 1
 
@@ -85,7 +86,7 @@ if __name__ == "__main__":
                 if response:
                     response += footer
                     try:
-                        comment.upvote()
+                        #comment.upvote()
                         comment.reply(response)
                         pending_comments.remove(comment)
                     except:
