@@ -59,36 +59,39 @@ if __name__ == "__main__":
             "[^Statsguru](http://stats.espncricinfo.com/ci/engine/stats/index.html)^. " + \
             "^(Check out the) [^code](http://github.com/pranavrc/howstat/) " + \
             "^(and the) [^HowTo!](http://redd.it/1i7lh3)"
-    pending_comments = []
+    #pending_comments = []
 
     while True:
         latest_comments = [cmt for cmt in subreddit.get_comments()]
 
-        for comment in latest_comments + pending_comments:
-            if "howstat" or "Howstat" in comment.body and not dealt_with(comment) \
+        for comment in latest_comments:
+            if any(x in comment.body for x in ['howstat', 'Howstat']) \
+               and not dealt_with(comment) \
                and str(comment.author) != "howstat":
                 response = ""
-                pending_comments.append(comment)
+                #pending_comments.append(comment)
                 request_limit = 1
 
                 for each_line in comment.body.split('\n'):
                     if each_line.strip()[0:7] in ['howstat', 'Howstat']:
-                        request = each_line.replace('howstat', '').strip('., ')
-                        response += fetch_stats(request) + '\n\n_____\n\n'
-                        request_limit += 1
-
-                    if request_limit > 3:
-                        if response:
+                        if request_limit <= 3:
+                            pass
+                        else:
                             response += '\n\nOnly three requests per Comment, sorry.' + \
                                     '\n\n_____\n\n'
-                        break
+                            break
+
+                        request = each_line.replace('howstat', '').\
+                                replace('Howstat','').strip('., ')
+                        response += fetch_stats(request) + '\n\n_____\n\n'
+                        request_limit += 1
 
                 if response:
                     response += footer
                     try:
                         #comment.upvote()
                         comment.reply(response)
-                        pending_comments.remove(comment)
+                        #pending_comments.remove(comment)
                     except:
                         continue
 
