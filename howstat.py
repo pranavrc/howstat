@@ -62,7 +62,7 @@ if __name__ == "__main__":
 
         for comment in latest_comments + pending_comments:
             if "howstat" in comment.body and not dealt_with(comment) \
-               and comment.author != "howstat":
+               and str(comment.author) != "howstat":
                 response = ""
                 pending_comments.append(comment)
 
