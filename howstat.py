@@ -34,16 +34,19 @@ def fetch_stats(request):
     try:
         final = prettifier.prettify(init.class_allround)
     except:
-        return "Ouch, nothing to see here, I think."
+        return request + ":\n\n" + "Ouch, nothing to see here, I think."
 
     elaborate = "Detailed Stats [here.](%s)" % base_url
 
     return request + ':\n\n' + final + '\n\n' + elaborate
 
 def dealt_with(comment):
-    for reply in comment.replies:
-        if str(reply.author) == 'howstat':
-            return True
+    try:
+        for reply in comment.replies:
+            if str(reply.author) == 'howstat':
+                return True
+    except:
+        pass
 
     return False
 
@@ -52,7 +55,7 @@ if __name__ == "__main__":
                                  "http://github.com/pranavrc/howstat/")
     r.login('username', 'password')
     subreddit = r.get_subreddit('howstat')
-    footer = "_____\n^(/u/howstat - Resident /r/Cricket  Statbot. Uses) " + \
+    footer = "\n^(/u/howstat - Resident /r/Cricket  Statbot. Uses) " + \
             "[^Statsguru](http://stats.espncricinfo.com/ci/engine/stats/index.html)^. " + \
             "^(Check out the) [^Code!](http://github.com/pranavrc/howstat/)"
     pending_comments = []
@@ -65,11 +68,19 @@ if __name__ == "__main__":
                and str(comment.author) != "howstat":
                 response = ""
                 pending_comments.append(comment)
+                request_limit = 1
 
                 for each_line in comment.body.split('\n'):
                     if each_line.strip()[0:7] == 'howstat':
                         request = each_line.replace('howstat', '').strip()
-                        response += fetch_stats(request) + '\n\n'
+                        response += fetch_stats(request) + '\n\n_____\n\n'
+                        request_limit += 1
+
+                    if request_limit > 3:
+                        if response:
+                            response += '\n\nOnly three requests per Comment, sorry.' + \
+                                    '\n\n_____\n\n'
+                        break
 
                 if response:
                     response += footer
