@@ -18,14 +18,17 @@ def fetch_stats(request):
         return "Sorry, the service seems to be unavailable right now."
 
     try:
-        base_url = player_url.zero_in().replace("class=11;", "")
+        if not player_url.test_player:
+            base_url = player_url.zero_in().replace("class=11;", "")
+        else:
+            base_url = player_url.zero_in().replace("class=1;", "")
     except:
         return "I couldn't find that, sorry."
 
     try:
         if base_url[-1] == ";":
             base_url += mapped
-            prettifier = Prettifier(base_url)
+            prettifier = Prettifier(base_url, player_url.test_player)
         else:
             return base_url
     except:
