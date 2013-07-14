@@ -59,7 +59,7 @@ if __name__ == "__main__":
     r = praw.Reddit(user_agent = "Howstat v 1.0 by /u/pranavrc"
                                  "http://github.com/pranavrc/howstat/")
     r.login('username', 'password')
-    subreddit = r.get_subreddit('howstat')
+    subreddit = r.get_subreddit('cricket')
     footer = "\n^(/u/howstat - Resident /r/Cricket  Statbot. Uses) " + \
             "[^Statsguru](http://stats.espncricinfo.com/ci/engine/stats/index.html)^. " + \
             "^(Check out the) [^code](http://github.com/pranavrc/howstat/) " + \
