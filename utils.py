@@ -91,6 +91,7 @@ class PlayerFinder:
     def __init__(self, player_name):
         self.player_name = player_name
         self.response = ""
+        self.test_player = False
 
     def zero_in(self):
         stats_url = self.base_url + \
@@ -98,6 +99,12 @@ class PlayerFinder:
                 self.player_name.replace(" ", "+") + ";template=analysis"
         document = lh.parse(stats_url)
         entries = document.xpath('//a[contains(text(), "Combined Test, ODI and T20I player")]')
+
+        if not entries:
+            entries = document.xpath('//a[contains(text(), "Test matches player")]')
+            if entries:
+                self.test_player = True
+
         players = document.findall("//span[@style='white-space: nowrap']")
 
         if len(entries) > 1:
@@ -116,11 +123,15 @@ class PlayerFinder:
 
 class Prettifier:
     target_url = ""
-    def __init__(self, target_url):
+    def __init__(self, target_url, tests_only):
         self.target_url = target_url
         self.stat_list = []
+        self.tests_only = tests_only
 
     def make_list(self):
+        if self.tests_only:
+            self.target_url = self.target_url.replace("class=11", "class=1")
+
         document = lh.parse(self.target_url)
         child_element = document.xpath('.//caption[contains(text(), "Career averages")]')
         target_element = child_element[0].getparent()
@@ -163,7 +174,13 @@ if __name__ == "__main__":
     b = a.map_string(str(raw_input()))
     print b
     c = PlayerFinder(a.player_name)
-    d = c.zero_in().replace("class=11;", "")
+    f = c.zero_in()
+    print f
+    if not c.test_player:
+        d = f.replace("class=11;", "")
+    else:
+        d = f.replace("class=1;", "")
+    
+    e = Prettifier(d + b, c.test_player)
     print d
-    e = Prettifier(d + b)
     print e.prettify(a.class_allround)
