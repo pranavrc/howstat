@@ -18,10 +18,11 @@ def fetch_stats(request):
         return "Sorry, the service seems to be unavailable right now."
 
     try:
+        zeroed_in = player_url.zero_in()
         if not player_url.test_player:
-            base_url = player_url.zero_in().replace("class=11;", "")
+            base_url = zeroed_in.replace("class=11;", "")
         else:
-            base_url = player_url.zero_in().replace("class=1;", "")
+            base_url = zeroed_in.replace("class=1;", "")
     except:
         return "I couldn't find that, sorry."
 
