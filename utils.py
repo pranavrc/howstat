@@ -37,7 +37,11 @@ class Mapper:
         'tests' : 1,
         'odis' : 2,
         't20is' : 3,
-        'all' : 11
+        'all' : 11,
+        'test' : 1,
+        'odi' : 2,
+        't20i' : 3,
+        't20' : 3
     }
 
     mappings = {
@@ -54,7 +58,9 @@ class Mapper:
     def map_string(self, request):
         cmds = {
             'vs' : 'opposition',
+            'against' : 'opposition',
             'in' : 'host',
+            'venue' : 'host',
             'at' : 'home_or_away',
             'format' : 'class',
             'year' : 'year'
