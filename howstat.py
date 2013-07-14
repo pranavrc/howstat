@@ -38,7 +38,8 @@ def fetch_stats(request):
     try:
         final = prettifier.prettify(init.class_allround)
     except:
-        return request + ":\n\n" + "Ouch, nothing to see here, I think."
+        return request + ":\n\n" + "Ouch, nothing to see here, I think. " + \
+                "You can check out the [records](%s)." % base_url
 
     elaborate = "Detailed Stats [here.](%s)" % base_url
 
