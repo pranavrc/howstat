@@ -101,7 +101,7 @@ class PlayerFinder:
         entries = document.xpath('//a[contains(text(), "Combined Test, ODI and T20I player")]')
 
         if not entries:
-            entries = document.xpath('//a[contains(text(), "Test matches player")]')
+            entries = document.xpath('//a[text() = "Test matches player"]')
             if entries:
                 self.test_player = True
 
