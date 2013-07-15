@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+# Helper modules for howstat.
+# Pranav Ravichandran <me@onloop.net>
 
 import lxml.html as lh
 from lxml.html.clean import Cleaner
@@ -8,6 +9,8 @@ from urllib import urlencode
 import re
 
 class Mapper:
+    ''' Contains mappings and a helper
+    to map input request to an URL. '''
     country_codes = {
         'afghanistan' : 40,
         'australia' : 2,
@@ -56,6 +59,7 @@ class Mapper:
     class_allround = False
 
     def map_string(self, request):
+        ''' Maps input request to an URL. '''
         cmds = {
             'vs' : 'opposition',
             'against' : 'opposition',
@@ -93,6 +97,8 @@ class Mapper:
         return request_url
 
 class PlayerFinder:
+    ''' Takes a player's name and returns his/her
+    relevant stats url in Statsguru. '''
     base_url = "http://stats.espncricinfo.com"
     def __init__(self, player_name):
         self.player_name = player_name
@@ -100,6 +106,7 @@ class PlayerFinder:
         self.test_player = False
 
     def zero_in(self):
+        ''' Returns the statistics URL of a player. '''
         stats_url = self.base_url + \
                 "/stats/engine/stats/analysis.html?search=" + \
                 self.player_name.replace(" ", "+") + ";template=analysis"
@@ -128,6 +135,7 @@ class PlayerFinder:
         return self.response
 
 class Prettifier:
+    ''' Helper functions to prettify scraped statistics data. '''
     target_url = ""
     def __init__(self, target_url, tests_only):
         self.target_url = target_url
@@ -135,6 +143,7 @@ class Prettifier:
         self.tests_only = tests_only
 
     def make_list(self):
+        ''' Makes a list of all relevant statistics values. '''
         if self.tests_only:
             self.target_url = self.target_url.replace("class=11", "class=1")
 
@@ -149,6 +158,7 @@ class Prettifier:
         return element_list
 
     def prettify(self, allround):
+        ''' Formats a statistics list into a reddit comment. '''
         self.stat_list = self.make_list()
         list_length = len(self.stat_list)
 
@@ -168,25 +178,19 @@ class Prettifier:
         return header + tr
 
     def splice_list(self, list_length, splice_length):
+        ''' Splits a list based on different categories. '''
         td = '||' + '|'.join(x for x in self.stat_list[0:splice_length]) + '|'
         delim = '|:' + '|:'.join('' for x in range(splice_length)) + '|:|:|'
         return td + '\n' + delim + '\n'
 
 if __name__ == "__main__":
-    #foo = str(raw_input())
-    #bar = PlayerFinder(foo)
-    #print bar
     a = Mapper()
     b = a.map_string(str(raw_input()))
-    print b
     c = PlayerFinder(a.player_name)
     f = c.zero_in()
-    print f
     if not c.test_player:
         d = f.replace("class=11;", "")
     else:
         d = f.replace("class=1;", "")
-    
     e = Prettifier(d + b, c.test_player)
-    print d
     print e.prettify(a.class_allround)
