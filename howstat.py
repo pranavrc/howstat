@@ -1,22 +1,31 @@
 #!/usr/bin/env python
+# Main howstat module.
+# Resident /r/Cricket Stats generator.
+# Pranav Ravichandran <me@onloop.net>
 
 import praw
 from utils import Mapper, PlayerFinder, Prettifier
 from time import sleep
 
+# Get the stats from the utils module helpers.
+# Creates a response based on the data received.
 def fetch_stats(request):
+    # Create a mapper instance
     init = Mapper()
 
+    # Create an URL mapping using the input request.
     try:
         mapped = init.map_string(request)
     except:
         return "Speak the language of my people, please!"
 
+    # Find the player using the player name in the request.
     try:
         player_url = PlayerFinder(init.player_name)
     except:
         return "Sorry, the service seems to be unavailable right now."
 
+    # Scrape and parse the statistics for the corresponding player.
     try:
         zeroed_in = player_url.zero_in()
         if not player_url.test_player:
@@ -26,6 +35,7 @@ def fetch_stats(request):
     except:
         return "I couldn't find that, sorry."
 
+    # Create a Prettifier instance if it's a valid stats url.
     try:
         if base_url[-1] == ";":
             base_url += mapped
@@ -35,16 +45,19 @@ def fetch_stats(request):
     except:
         return base_url
 
+    # Format the content for a reddit comment.
     try:
         final = prettifier.prettify(init.class_allround)
     except:
         return request + ":\n\n" + "Ouch, nothing to see here, I think. " + \
                 "You can check out the [records](%s)." % base_url
 
+    # Url for complete stats.
     elaborate = "Detailed Stats [here.](%s)" % base_url
 
     return request + ':\n\n' + final + '\n\n' + elaborate
 
+# Check if howstat has already replied to the comment.
 def dealt_with(comment):
     try:
         for reply in comment.replies:
@@ -67,6 +80,7 @@ if __name__ == "__main__":
     #pending_comments = []
 
     while True:
+        # Get the latest comments from /r/cricket.
         latest_comments = [cmt for cmt in subreddit.get_comments()]
 
         for comment in latest_comments:
@@ -82,6 +96,7 @@ if __name__ == "__main__":
                         if request_limit <= 3:
                             pass
                         else:
+                            # More than 3 requests in one comment.
                             response += '\n\nOnly three requests per Comment, sorry.' + \
                                     '\n\n_____\n\n'
                             break
