@@ -52,7 +52,9 @@ class Mapper:
         'opposition' : country_codes,
         'host' : country_codes,
         'home_or_away' : venues,
-        'year' : ''
+        'year' : '',
+        'spanmin1' : '',
+        'spanmax1' : ''
     }
 
     player_name = ""
@@ -83,7 +85,27 @@ class Mapper:
                 class_found = True
 
             if param == 'year':
-                request_map[param] = v.lower()
+                if '-' in v:
+                    min_year, max_year = v.split('-')
+
+                    if len(min_year.split()) > 2:
+                        request_map['spanmin1'] = re.sub(' +', ' ', min_year).strip().replace(' ', '+')
+                    elif len(min_year.split()) == 2:
+                        request_map['spanmin1'] = '1+' + re.sub(' +', ' ', min_year).strip().replace(' ', '+')
+                    else:
+                        request_map['spanmin1'] = '1+Jan+' + min_year.strip().replace(' ', '+')
+
+                    if len(max_year.split()) > 2:
+                        request_map['spanmax1'] = re.sub(' +', ' ', max_year).strip().replace(' ', '+')
+                    elif len(max_year.split()) == 2:
+                        request_map['spanmax1'] = '28+' + re.sub(' +', ' ', max_year).strip().replace(' ', '+')
+                    else:
+                        request_map['spanmax1'] = '28+Dec+' + max_year.strip().replace(' ', '+')
+
+
+                    request_map['spanval1'] = 'span'
+                else:
+                    request_map[param] = v.lower()
             else:
                 request_map[param] = self.mappings[param][v.lower()]
 
@@ -93,7 +115,7 @@ class Mapper:
         if len(request_map) == 1:
             self.class_allround = True
 
-        request_url = urlencode(request_map).replace("&", ";")
+        request_url = urlencode(request_map).replace("&", ";").replace("%2B", "+")
         return request_url
 
 class PlayerFinder:
