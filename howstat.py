@@ -77,16 +77,18 @@ if __name__ == "__main__":
             "[^Statsguru](http://stats.espncricinfo.com/ci/engine/stats/index.html)^. " + \
             "^(Check out the) [^code](http://github.com/pranavrc/howstat/) " + \
             "^(and the) [^HowTo!](http://redd.it/1i7lh3)"
-    #pending_comments = []
+    old_list = []
 
     while True:
         # Get the latest comments from /r/cricket.
         latest_comments = [cmt for cmt in subreddit.get_comments()]
+        new_list = []
 
         for comment in latest_comments:
             if any(x in comment.body for x in ['howstat', 'Howstat']) \
                and not dealt_with(comment) \
-               and str(comment.author) != "howstat":
+               and str(comment.author) != "howstat" \
+               and not comment.id in old_list:
                 response = ""
                 #pending_comments.append(comment)
                 request_limit = 1
@@ -111,8 +113,10 @@ if __name__ == "__main__":
                     try:
                         #comment.upvote()
                         comment.reply(response)
+                        new_list.append(comment.id)
                         #pending_comments.remove(comment)
                     except:
                         continue
 
-        #sleep(60)
+        old_list = new_list
+        #sleep(10)
