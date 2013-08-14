@@ -17,7 +17,7 @@ def fetch_stats(request):
     try:
         mapped = init.map_string(request)
     except:
-        return "Speak the language of my people, please!"
+        return "Uh, like..I mean, like..really..like, y'know...What?"
 
     # Find the player using the player name in the request.
     try:
@@ -73,10 +73,10 @@ if __name__ == "__main__":
                                  "http://github.com/pranavrc/howstat/")
     r.login('username', 'password')
     subreddit = r.get_subreddit('cricket')
-    footer = "\n^(/u/howstat - Resident /r/Cricket  Statbot. Uses) " + \
-            "[^Statsguru](http://stats.espncricinfo.com/ci/engine/stats/index.html)^. " + \
+    footer = "\n^(/u/howstat - Resident /r/Cricket  Statbot. ) " + \
             "^(Check out the) [^code](http://github.com/pranavrc/howstat/) " + \
-            "^(and the) [^HowTo!](http://redd.it/1i7lh3)"
+            "^(and the) [^(HOW TO.)](http://redd.it/1i7lh3) " + \
+	    "^(For testing, use) [^(THIS THREAD)](http://redd.it/1i7lh3) ^(please.)"
     old_list = []
 
     while True:
@@ -112,6 +112,7 @@ if __name__ == "__main__":
                     response += footer
                     try:
                         #comment.upvote()
+                        #print response
                         comment.reply(response)
                         new_list.append(comment.id)
                         #pending_comments.remove(comment)
@@ -119,4 +120,4 @@ if __name__ == "__main__":
                         continue
 
         old_list = new_list
-        #sleep(10)
+        #sleep(20)
