@@ -6,6 +6,7 @@
 import praw
 from utils import Mapper, PlayerFinder, Prettifier
 from time import sleep
+from user import username, password
 
 # Get the stats from the utils module helpers.
 # Creates a response based on the data received.
@@ -71,24 +72,25 @@ def dealt_with(comment):
 if __name__ == "__main__":
     r = praw.Reddit(user_agent = "Howstat v 1.0 by /u/pranavrc"
                                  "http://github.com/pranavrc/howstat/")
-    r.login('username', 'password')
+    r.login(username, password)
     subreddit = r.get_subreddit('cricket')
     footer = "\n^(/u/howstat - Resident /r/Cricket  Statbot. ) " + \
             "^(Check out the) [^code](http://github.com/pranavrc/howstat/) " + \
             "^(and the) [^(HOW TO.)](http://redd.it/1i7lh3) " + \
 	    "^(For testing, use) [^(THIS THREAD)](http://redd.it/1i7lh3) ^(please.)"
-    old_list = []
+    #old_list = []
+    last_comment_time = 0
 
     while True:
         # Get the latest comments from /r/cricket.
         latest_comments = [cmt for cmt in subreddit.get_comments()]
-        new_list = []
+        #new_list = []
 
         for comment in latest_comments:
             if any(x in comment.body for x in ['howstat', 'Howstat']) \
                and not dealt_with(comment) \
                and str(comment.author) != "howstat" \
-               and not comment.id in old_list:
+               and not comment.created_utc <= last_comment_time:
                 response = ""
                 #pending_comments.append(comment)
                 request_limit = 1
@@ -113,11 +115,12 @@ if __name__ == "__main__":
                     try:
                         #comment.upvote()
                         #print response
+			last_comment_time = comment.created_utc
                         comment.reply(response)
-                        new_list.append(comment.id)
+                        #new_list.append(comment.id)
                         #pending_comments.remove(comment)
                     except:
                         continue
 
-        old_list = new_list
+        #old_list = new_list
         #sleep(20)
