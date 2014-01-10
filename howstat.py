@@ -97,11 +97,11 @@ if __name__ == "__main__":
 
                 for each_line in comment.body.split('\n'):
                     if each_line.strip()[0:7] in ['howstat', 'Howstat']:
-                        if request_limit <= 3:
+                        if request_limit <= 5:
                             pass
                         else:
-                            # More than 3 requests in one comment.
-                            response += '\n\nOnly three requests per Comment, sorry.' + \
+                            # More than 5 requests in one comment.
+                            response += '\n\nOnly five requests per Comment, sorry.' + \
                                     '\n\n_____\n\n'
                             break
 
